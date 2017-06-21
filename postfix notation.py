@@ -1,3 +1,5 @@
+import re
+
 def set_tokenPrec(token):
     # If the token is * or / then precedence value of 3
     if token == "*" or token == "/":
@@ -73,8 +75,17 @@ def postfix_evaluation(s):
             stack.append(float(b) - float(a))
     return stack.pop()
 
-s = "20 * 30"
-c = infixExpressionConvert(s)
+def a(v):
+    for i in v:
+        if i == '*' or '+' or '-' or  '/':
+            print(i)
+        else:
+            return None
+
+s = "10*2"
+pat = re.compile(r"([-*/()!+])")
+print (pat.sub(" \\1 ", s))
+c = infixExpressionConvert(pat.sub(" \\1 ", s))
 print("Infix : "+c)
 val = postfix_evaluation(c)
 print("Result :" + str(val))
