@@ -1,114 +1,80 @@
-import math
-import operator
-ops = {'+':operator.add,
-       '-':operator.sub,
-       '*':operator.mul,
-       '/':operator.truediv,
-       '^':operator.pow,
-       'sin':math.sin,
-       'tan':math.tan,
-       'cos':math.cos,
-       'pi':math.pi}
+def set_tokenPrec(token):
+    # If the token is * or / then precedence value of 3
+    if token == "*" or token == "/":
+        return float(3)
+    # If the token is + or - then precedence value of 2
+    elif token == "+" or token == "-":
+        return float(2)
+    # If the token is ( or ) then the precedence value of 1
+    elif token == "(" or token == ")":
+        return float(1)
 
-postfix = []
-temp = []
-operator = -10
-operand = -20
-leftparentheses = -30
-rightparentheses = -40
-empty = -50
-
-
-def precedence(s):
-    if s is '(':
-        return 0
-    elif s is '+' or s is '-':
-        return 1
-    elif s is '*' or s is '/' or s is '%':
-        return 2
-    else:
-        return 99
-
-
-def typeof(s):
-    if s is '(':
-        return leftparentheses
-    elif s is ')':
-        return rightparentheses
-    elif s is '+' or s is '-' or s is '*' or s is '%' or s is '/':
-        return operator
-    elif s is ' ':
-        return empty
-    else:
-        return operand
-
-def convert (self, l):
-        l.reverse ()
-        for e in l:
-            self.push (e)
-        return self.stack.pop ()
-
-def is_number(s):
-    try:
-        float(s)
-        return True
-    except ValueError:
-        pass
-
-def calculate(equation):
-    stack = []
-    result = 0
-    for i in equation:
-        if is_number(i):
-            stack.insert(0,i)
+def infixExpressionConvert(infixExpr):
+    # Create empty stack called opstack for the operators
+    opstack = []
+    # Create empty list for output
+    outList = []
+    # Convert the infix string to a list by using the string method split
+    tokens = infixExpr.split()
+    # Scan the token list left to right
+    for token in tokens:
+    # If the token is an operand: append it to the end of the output list
+        if token.isdigit() or token.isalpha():
+            outList.append(token)
+    # If the token is (: push it on the opstack
+        elif token == '(':
+            opstack.append(token)
+    # If the token is ): pop the opstack until matching ( is removed
+    #   and append each operator to the end of the output list
+        elif token == ')':
+            specialtoken = opstack.pop()
+            while specialtoken != '(':
+                outList.append(specialtoken)
+                specialtoken = opstack.pop()
+    # If the token is an operator * / + - push it on the opstack
+    #   but first remove any operators already on the opstack that have
+    #   higher or equal precedence and append them to the output list
         else:
-            if len(stack) < 2:
-                print ('Error: insufficient values in expression')
-                break
-            else:
-                print ('stack: %s' % stack)
-                if len(i) == 1:
-                    n1 = float(stack.pop(1))
-                    n2 = float(stack.pop(0))
-                    result = ops[i](n1,n2)
-                    stack.insert(0,str(result))
-                else:
-                    n1 = float(stack.pop(0))
-                    result = ops[i](math.radians(n1))
-                    stack.insert(0,str(result))
-    return result
+            while (len(opstack) != 0 ) and ( (set_tokenPrec(opstack[0])) >= (set_tokenPrec(token)) ):
+                outList.append(opstack.pop())
+            opstack.append(token)
+    # when input expression completely traversed, check opStack
+    #   if any operators still on stack, remove them and append to end
+    #   of output list
+    while len(opstack) != 0:
+        outList.append(opstack.pop())
+    # returns result as a string
+    return " ".join(outList)
 
-def main():
-    running = True
-    while running:
-        equation = input("Enter the infix notation : ")
-        for i in equation:
-            type = typeof(i)
-            if type is leftparentheses:
-                temp.append(i)
-            elif type is rightparentheses:
-                next = temp.pop()
-                while next is not '(':
-                    postfix.append(next)
-                    next = temp.pop()
-            elif type is operand:
-                postfix.append(i)
-            elif type is operator:
-                p = precedence(i)
-                while len(temp) is not 0 and p <= precedence(temp[-1]):
-                    postfix.append(temp.pop())
-                temp.append(i)
-            elif type is empty:
-                continue
-        while len(temp) > 0:
-            postfix.append(temp.pop())
-        print("Postfix notation : ")
-        print("".join(postfix))
-        answer = calculate(postfix)
-        print ('RESULT: %f' % answer)
-        again = input('\nEnter another? ')[0].upper()
-        if again != 'Y':
-            running = False
 
-if __name__ == '__main__':
-    main()
+def postfix_evaluation(s):
+    s = s.split()
+    n = len(s)
+    stack = []
+    for i in range(n):
+        if s[i].isdigit():
+            # append function is equivalent to push
+            stack.append(float(s[i]))
+        elif s[i] == "+":
+            a = stack.pop()
+            b = stack.pop()
+            stack.append(float(a) + float(b))
+        elif s[i] == "*":
+            a = stack.pop()
+            b = stack.pop()
+            stack.append(float(a) * float(b))
+        elif s[i] == "/":
+            a = stack.pop()
+            b = stack.pop()
+            stack.append(float(b) / float(a))
+        elif s[i] == "-":
+            a = stack.pop()
+            b = stack.pop()
+            stack.append(float(b) - float(a))
+    return stack.pop()
+
+s = "20 * 30"
+c = infixExpressionConvert(s)
+print("Infix : "+c)
+val = postfix_evaluation(c)
+print("Result :" + str(val))
