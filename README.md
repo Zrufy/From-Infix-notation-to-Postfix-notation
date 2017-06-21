@@ -6,4 +6,7 @@ The code presents some bugs that I would like to improve. I would like to ask an
 
 2) Increase the possibility of adding the calculation gonimetria and powers.
 
+3) Work with float,double number.
+
+
 If you notice other bugs let me know.
